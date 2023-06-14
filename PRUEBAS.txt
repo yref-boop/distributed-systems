@@ -1,0 +1,58 @@
+Añadir evento:
+
+    mvn exec:java -D"exec.mainClass"="es.udc.ws.app.client.ui.AppServiceClient" -D"exec.args"="-a 'Fiesta' 'Fiesta Verano' '2023-08-15T17:00' '2023-08-16T00:00'"                        // eventId=1 creado
+    mvn exec:java -D"exec.mainClass"="es.udc.ws.app.client.ui.AppServiceClient" -D"exec.args"="-a 'Presentación' 'Presentación de producto' '2023-09-15T11:00' '2023-09-15T13:00'"       // eventId=2 creado
+    mvn exec:java -D"exec.mainClass"="es.udc.ws.app.client.ui.AppServiceClient" -D"exec.args"="-a 'Fiesta' 'Fiesta Otoño' '2023-10-15T17:00' '2023-10-16T00:00'"                         // eventId=3 creado
+    mvn exec:java -D"exec.mainClass"="es.udc.ws.app.client.ui.AppServiceClient" -D"exec.args"="-a ' ' 'Cena Otoño' '2023-10-01T21:00' '2023-10-02T00:00'"                                // Falla (nombre inválido)
+    mvn exec:java -D"exec.mainClass"="es.udc.ws.app.client.ui.AppServiceClient" -D"exec.args"="-a 'Cena' ' ' '2023-10-01T21:00' '2023-10-02T00:00'"                                      // Falla (descripción inválida)
+    mvn exec:java -D"exec.mainClass"="es.udc.ws.app.client.ui.AppServiceClient" -D"exec.args"="-a 'Cena' 'Cena Otoño' '2022-08-01T21:00' '2022-08-02T00:00'"                             // Falla (fecha inválida)
+    mvn exec:java -D"exec.mainClass"="es.udc.ws.app.client.ui.AppServiceClient" -D"exec.args"="-a 'Cena' 'Cena Otoño' '2023-10-01T21:00' '2023-10-01T20:00'"                             // Falla (fecha fin <= fin inicio)
+
+
+Responder a un evento:
+
+    mvn exec:java -D"exec.mainClass"="es.udc.ws.app.client.ui.AppServiceClient" -D"exec.args"="-r 'user1@udc.es' 1 true"        // respId=1 creada
+    mvn exec:java -D"exec.mainClass"="es.udc.ws.app.client.ui.AppServiceClient" -D"exec.args"="-r 'user2@udc.es' 1 false"       // respId=2 creada
+    mvn exec:java -D"exec.mainClass"="es.udc.ws.app.client.ui.AppServiceClient" -D"exec.args"="-r 'user1@udc.es' 3 false"       // respId=3 creada
+    mvn exec:java -D"exec.mainClass"="es.udc.ws.app.client.ui.AppServiceClient" -D"exec.args"="-r 'user3@udc.es' 3 false"       // respId=4 creada
+    mvn exec:java -D"exec.mainClass"="es.udc.ws.app.client.ui.AppServiceClient" -D"exec.args"="-r 'user1@udc.es' 3 true"        // Falla (ya respondido)
+    mvn exec:java -D"exec.mainClass"="es.udc.ws.app.client.ui.AppServiceClient" -D"exec.args"="-r 'user1@udc.es' 9 true"        // Falla (evento no existe)
+
+    UPDATE ws.event SET celebrationDate='2022-08-01 21:00' WHERE eventId=2;
+
+    mvn exec:java -D"exec.mainClass"="es.udc.ws.app.client.ui.AppServiceClient" -D"exec.args"="-r 'user4@udc.es' 2 true"        // Falla (fuera de plazo)
+
+
+Cancelar un evento:
+
+    mvn exec:java -D"exec.mainClass"="es.udc.ws.app.client.ui.AppServiceClient" -D"exec.args"="-c 3"        // eventId=3 cancelado
+    mvn exec:java -D"exec.mainClass"="es.udc.ws.app.client.ui.AppServiceClient" -D"exec.args"="-c 3"        // Falla (evento cancelado)
+    mvn exec:java -D"exec.mainClass"="es.udc.ws.app.client.ui.AppServiceClient" -D"exec.args"="-c 2"        // Falla (fuera de plazo)
+    mvn exec:java -D"exec.mainClass"="es.udc.ws.app.client.ui.AppServiceClient" -D"exec.args"="-c 9"        // Falla (evento no existe)
+
+
+Responder a un evento cancelado:
+
+    mvn exec:java -D"exec.mainClass"="es.udc.ws.app.client.ui.AppServiceClient" -D"exec.args"="-r 'user4@udc.es' 3 true"        // Falla (evento cancelado)
+
+
+Buscar eventos por fecha y descripción:
+
+    mvn exec:java -D"exec.mainClass"="es.udc.ws.app.client.ui.AppServiceClient" -D"exec.args"="-fes '2023-12-01'"                  // Devuelve eventos con id 1 y 3
+    mvn exec:java -D"exec.mainClass"="es.udc.ws.app.client.ui.AppServiceClient" -D"exec.args"="-fes '2023-09-01'"                  // Devuelve evento con id 1
+    mvn exec:java -D"exec.mainClass"="es.udc.ws.app.client.ui.AppServiceClient" -D"exec.args"="-fes '2023-12-01' 'Verano'"         // Devuelve evento con id 1
+    mvn exec:java -D"exec.mainClass"="es.udc.ws.app.client.ui.AppServiceClient" -D"exec.args"="-fes '2023-08-01'"                  // Devuelve lista vacía
+    mvn exec:java -D"exec.mainClass"="es.udc.ws.app.client.ui.AppServiceClient" -D"exec.args"="-fes '2022-08-01'"                  // Falla (fecha pasada) o devuelve lista vacía
+
+
+Buscar evento por identificador:
+
+    mvn exec:java -D"exec.mainClass"="es.udc.ws.app.client.ui.AppServiceClient" -D"exec.args"="-fe 2"
+    mvn exec:java -D"exec.mainClass"="es.udc.ws.app.client.ui.AppServiceClient" -D"exec.args"="-fe 9"        // Falla (evento no existe)
+
+
+Buscar respuestas de un usuario:
+
+    mvn exec:java -D"exec.mainClass"="es.udc.ws.app.client.ui.AppServiceClient" -D"exec.args"="-fr 'user1@udc.es' false"        // Devuelve respuestas con id 1 y 3
+    mvn exec:java -D"exec.mainClass"="es.udc.ws.app.client.ui.AppServiceClient" -D"exec.args"="-fr 'user1@udc.es' true"         // Devuelve respuestas con id 1
+    mvn exec:java -D"exec.mainClass"="es.udc.ws.app.client.ui.AppServiceClient" -D"exec.args"="-fr 'user6@udc.es' true"         // Devuelve lista vacía
